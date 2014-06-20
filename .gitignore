@@ -4,3 +4,4 @@
 *.a
 *.log
 *.swp
+build/
