@@ -1,0 +1,8 @@
+PROJECT(priority_queue)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR})
+SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+set(CMAKE_CXX_FLAGS "-std=c++11 -g")
+SET(SRC thread_pool_test.cc)
+ADD_EXECUTABLE(thread_pool_test ${SRC})
+TARGET_LINK_LIBRARIES(thread_pool_test pthread boost_thread boost_system)
