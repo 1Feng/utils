@@ -16,7 +16,7 @@
 #else
 #define SAFE_PTHREAD(exp)  do {                    \
   int ret = exp;                                   \
-  assert(ret);                                     \
+  assert(!ret);                                    \
 } while (0)
 #endif
 
@@ -120,14 +120,17 @@ class UniqueLock {
  public:
   explicit UniqueLock(Mutex& mutex) : mutex_(mutex) {
     mutex_.lock();
+    owns_ = true;
   }
 
   ~UniqueLock() {
     mutex_.unlock();
+    owns_ = false;
   }
 
   inline void lock() {
     mutex_.lock();
+    owns_ = true;
   }
 
   inline bool try_lock() {
@@ -136,6 +139,15 @@ class UniqueLock {
 
   inline void unlock() {
     mutex_.unlock();
+    owns_ = false;
+  }
+
+  inline bool owns_lock() {
+    return owns_;
+  }
+
+  inline Mutex& get_mutex() {  // NOLINT
+    return mutex_;
   }
 
  private:
@@ -144,6 +156,7 @@ class UniqueLock {
   void operator=(const UniqueLock&);
 
  private:
+  bool owns_;
   Mutex& mutex_;
 };
 

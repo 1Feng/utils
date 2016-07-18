@@ -21,15 +21,18 @@ class ConditionVariable {
     SAFE_PTHREAD(pthread_cond_destroy(&cond_));
   }
 
-  inline void wait(Mutex* mutex) {
-    SAFE_PTHREAD(pthread_cond_wait(&cond_, mutex->get_posix_mutex()));
+  inline void wait(UniqueLock& ulock) {  // NOLINT
+    assert(ulock.owns_lock());
+    SAFE_PTHREAD(pthread_cond_wait(&cond_,
+                                   ulock.get_mutex().get_posix_mutex()));
   }
 
   // return true if timeout, otherwise return false
-  inline bool wait_for(Mutex* mutex, int seconds) {
+  inline bool wait_for(UniqueLock& ulock, int seconds) {  // NOLINT
+    assert(ulock.owns_lock());
     struct timespec timeout = {seconds, 0};
     int ret = pthread_cond_timedwait(&cond_,
-                                     mutex->get_posix_mutex(),
+                                     ulock.get_mutex().get_posix_mutex(),
                                      &timeout);
     if (ret == ETIMEDOUT) {
       return true;
