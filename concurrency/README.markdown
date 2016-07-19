@@ -1,6 +1,5 @@
-// Copyright (c) 2016
-// Author: @1Feng
-// Mail: codingforfan@gmail.com
+####demo:
+```CPP
 #include <cstdio>
 #include <iostream>
 #include <vector>
@@ -25,3 +24,4 @@ int main() {
   printf("queue size : %d\n", static_cast<int>(pool.queue_size()));
   return 0;
 }
+```

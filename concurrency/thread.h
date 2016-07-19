@@ -9,15 +9,21 @@
 #include <boost/function.hpp>
 
 #ifdef NDEBUG
+#ifndef SAFE_PTHREAD
 #define SAFE_PTHREAD(exp)  do {                    \
-  int ret = exp;                                   \
-  if (ret != 0) abort();                           \
+  if (exp != 0) abort();                           \
 } while (0)
+#endif
 #else
+#ifndef SAFE_PTHREAD
 #define SAFE_PTHREAD(exp)  do {                    \
   int ret = exp;                                   \
-  assert(!ret);                                    \
+  (!(ret)                                          \
+  ? __ASSERT_VOID_CAST(0)                          \
+  : __assert_perror_fail((ret), __FILE__,          \
+                __LINE__, __ASSERT_FUNCTION));     \
 } while (0)
+#endif
 #endif
 namespace concurrency {
 

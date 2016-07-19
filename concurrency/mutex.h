@@ -7,16 +7,19 @@
 #include <pthread.h>
 #include <assert.h>
 #include <stdlib.h>
+#include <cstdio>
 
 #ifdef NDEBUG
 #define SAFE_PTHREAD(exp)  do {                    \
-  int ret = exp;                                   \
-  if (ret != 0) abort();                           \
+  if (exp != 0) abort();                           \
 } while (0)
 #else
 #define SAFE_PTHREAD(exp)  do {                    \
   int ret = exp;                                   \
-  assert(!ret);                                    \
+  (!(ret)                                          \
+  ? __ASSERT_VOID_CAST(0)                          \
+  : __assert_perror_fail((ret), __FILE__,          \
+                __LINE__, __ASSERT_FUNCTION));     \
 } while (0)
 #endif
 
@@ -30,6 +33,7 @@ class Mutex {
 
   ~Mutex() {
     SAFE_PTHREAD(pthread_mutex_destroy(&mutex_));
+    printf("~ %p\n", this);
   }
 
   inline void lock() {

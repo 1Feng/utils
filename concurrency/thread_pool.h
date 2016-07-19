@@ -3,9 +3,10 @@
 // Mail: codingforfan@gmail.com
 #ifndef CONCURRENCY_THREAD_POOL_H_
 #define CONCURRENCY_THREAD_POOL_H_
+#include <vector>
 #include <queue>
 #include <boost/bind.hpp>
-#include "thread.h"
+#include "thread.h"     // NOLINT
 #include "condition.h"  // NOLINT
 
 namespace concurrency {
@@ -16,11 +17,11 @@ class ThreadPool {
  public:
   explicit ThreadPool(size_t n) :
                      stop_(false),
-                     size_(0),
+                     size_(n),
                      mutex_(),
                      cond_(),
                      pool_(),
-                     queue_(){
+                     queue_() {
     for (size_t i = 0; i < n; ++i) {
       pool_.push_back(new Thread(boost::bind(&ThreadPool::loop, this)));
     }
@@ -55,14 +56,14 @@ class ThreadPool {
   }
 
  private:
-  // TODO(@yfjiang): there's some bug
   void loop() {
-    UniqueLock ulock(mutex_);
     while (true) {
+      UniqueLock ulock(mutex_);
       while (!stop_ && queue_.empty()) {
         cond_.wait(ulock);
       }
       if (stop_) {
+        // it should give up the tasks in queue
         break;
       }
       task_type t = queue_.front();
