@@ -89,7 +89,7 @@ class RWMutex {
   }
 
   inline void unlock() {
-    SAFE_PTHREAD(pthread_rwlock_destroy(&mutex_));
+    SAFE_PTHREAD(pthread_rwlock_unlock(&mutex_));
   }
 
  private:
